@@ -1,0 +1,65 @@
+.historico-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  .historico-list {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .historico-item {
+    background-color: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    overflow: hidden;
+  }
+  
+  .historico-item-header {
+    background-color: #f0f0f0;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .acao-tipo {
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .acao-data {
+    font-size: 0.9em;
+    color: #666;
+  }
+  
+  .historico-item-body {
+    padding: 15px;
+  }
+  
+  .historico-item-body p {
+    margin: 5px 0;
+    font-size: 0.95em;
+  }
+  
+  .historico-message {
+    text-align: center;
+    font-size: 1.1em;
+    color: #666;
+    margin-top: 50px;
+  }
+  
+  .error {
+    color: #d32f2f;
+  }
+  
+  

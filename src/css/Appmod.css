@@ -1,0 +1,31 @@
+
+
+.header-mod{
+  width: 100%;
+  height: 100px;
+  background-color: #1F0171;
+  border-collapse: collapse;
+}
+
+.header-mod h1{
+  position : relative;
+  bottom: 140px;
+  right: 550px;
+  
+  
+  font-size: 70px;
+  color: #fff; 
+  font-family: "Poppins", sans-serif;  
+}
+
+.logo-mod{
+  height: 100px;
+  bottom: 50px;
+
+}
+
+.navbar{
+  width: 100%;
+}
+
+
