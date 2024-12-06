@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import '../css/Historico.css';
+import './../css/Historico.css';
 
 const Historico = () => {
   const [historico, setHistorico] = useState([]);

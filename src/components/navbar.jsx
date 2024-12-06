@@ -1,5 +1,5 @@
 import React from 'react';
-import '../css/Navmod.css';
+import './../css/Navmod.css';
 
 const NavBar = ({ setActiveTab }) => {
   return (

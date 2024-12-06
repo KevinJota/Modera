@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Modal from "react-modal";
-import '../css/Usuario.css';
+import './../css/Usuario.css';
 
 const Usuarios = ({ moderadorId }) => {
     const [usuarios, setUsuarios] = useState([]);
