@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { auth } from '../services/firebase-config';
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
-import '../css/Login.css';
+import './../css/Login.css';
 
 // eslint-disable-next-line react/prop-types
 const Login = ({ onLogin }) => {
