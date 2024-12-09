@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Modal from "react-modal";
 import './../css/Eventos.css';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { MapPin, Calendar, Users } from 'lucide-react';
+
 
 const Eventos = () => {
   const [eventos, setEventos] = useState([]);
@@ -185,17 +185,17 @@ const Eventos = () => {
             <div className="card-text-first">
               <strong className="card-text-ongname">{evento.ongnome}</strong>
               <span className="date-container">
-                <Calendar size={16} />
+                
                 {evento.data_inicial}
               </span>
             </div>
             <div className="card-text-second">
               <span className="card-address">
-                <MapPin size={16} />
+                
                 {evento.localidade}
               </span>
               <span className="card-vagas">
-                <Users size={16} />
+                
                 {evento.vagas} vagas
               </span>
             </div>
