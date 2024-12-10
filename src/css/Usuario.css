@@ -10,6 +10,20 @@ h1 {
   color: #333;
 }
 
+.search-container {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.search-input {
+  width: 48%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -41,15 +55,6 @@ button {
   cursor: pointer;
   font-size: 14px;
   transition: background-color 0.3s;
-}
-
-.btn-delete {
-  background-color: #f44336;
-  color: white;
-}
-
-.btn-delete:hover {
-  background-color: #d32f2f;
 }
 
 .btn-warn {

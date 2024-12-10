@@ -3,7 +3,6 @@ import Modal from "react-modal";
 import './../css/Eventos.css';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
-
 const Eventos = () => {
   const [eventos, setEventos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -12,6 +11,7 @@ const Eventos = () => {
   const [selectedEventos, setSelectedEventos] = useState(null);
   const [advertencia, setAdvertencia] = useState('');
   const [moderadorId, setModeradorId] = useState(null);
+  const [deletingEventId, setDeletingEventId] = useState(null);
 
   useEffect(() => {
     const auth = getAuth();
@@ -30,15 +30,18 @@ const Eventos = () => {
 
   const fetchEventos = async () => {
     try {
+      setLoading(true);
       const response = await fetch('https://volun-api-eight.vercel.app/eventos/');
       if (!response.ok) {
         throw new Error('Erro ao buscar os eventos');
       }
       const data = await response.json();
-      setEventos(data);
-      setLoading(false);
+      setEventos(data.reverse());
+      setError(null);
     } catch (err) {
       setError(err.message);
+      console.error('Erro ao buscar eventos:', err);
+    } finally {
       setLoading(false);
     }
   };
@@ -63,30 +66,6 @@ const Eventos = () => {
       }
     } catch (err) {
       console.error('Erro ao registrar ação:', err);
-      throw err;
-    }
-  };
-
-  const criarAdvertencia = async (usuarioId, motivo) => {
-    try {
-      const response = await fetch('https://volun-api-eight.vercel.app/advertencias', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          moderador_id: moderadorId,
-          usuario_id: usuarioId,
-          motivo: motivo,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Erro ao criar advertência');
-      }
-
-      return await response.json();
-    } catch (err) {
-      console.error('Erro ao criar advertência:', err);
-      throw err;
     }
   };
 
@@ -96,20 +75,22 @@ const Eventos = () => {
     if (!confirmDelete) return;
 
     try {
+      setDeletingEventId(evento._id);
+      
       const response = await fetch(`https://volun-api-eight.vercel.app/eventos/${evento._id}`, {
         method: 'DELETE',
       });
 
-      if (!response.ok) {
-        const errorDetails = await response.text();
-        console.error('Erro ao excluir o evento:', errorDetails);
+      // Even if we get a 500 error, if it's because the event was not found,
+      // we should still remove it from the UI
+      if (!response.ok && response.status !== 500) {
         throw new Error('Erro ao excluir o evento');
       }
 
-      setEventos((prevEventos) =>
-        prevEventos.filter((e) => e._id !== evento._id)
-      );
+      // Remove the event from the local state
+      setEventos(prevEventos => prevEventos.filter(e => e._id !== evento._id));
 
+      // Register the action only if we're sure the event was deleted
       await registrarAcao(
         'excluir',
         evento._id,
@@ -121,6 +102,11 @@ const Eventos = () => {
     } catch (err) {
       console.error('Erro ao excluir o evento:', err);
       alert(`Erro ao excluir o evento: ${err.message}`);
+      
+      // Refresh the events list to ensure UI is in sync with server
+      await fetchEventos();
+    } finally {
+      setDeletingEventId(null);
     }
   };
 
@@ -130,10 +116,10 @@ const Eventos = () => {
   };
 
   function truncateText(text, length) {
-    if (text.length > length) {
+    if (text?.length > length) {
       return text.substring(0, length) + "...";
     }
-    return text;
+    return text || '';
   }
 
   const handleApplyAdvertencia = async () => {
@@ -165,53 +151,46 @@ const Eventos = () => {
     }
   };
 
-  if (loading) {
-    return <div className="loading">Carregando...</div>;
-  }
-
-  if (error) {
-    return <div className="error">Erro: {error}</div>;
-  }
-
   return (
     <div className="eventos-container">
-      {eventos.map(evento => (
-        <div key={evento._id} className="card-x">
-          <div className="card-capa-img" style={{ backgroundImage: `url(${evento.imagem})` }}>
-            <span className="card-title">{evento.titulo}</span>
+      {loading && !deletingEventId && (
+        <div className="loading">Carregando...</div>
+      )}
+      {error && !loading && (
+        <div className="error">Erro: {error}</div>
+      )}
+      <div className={`eventos-grid ${loading && !deletingEventId ? 'hidden' : ''}`}>
+        {eventos.map(evento => (
+          <div key={evento._id} className={`card-x ${deletingEventId === evento._id ? 'deleting' : ''}`}>
+            <div className="card-capa-img" style={{ backgroundImage: `url(${evento.imagem})` }}>
+              <span className="card-title">{evento.titulo}</span>
+            </div>
+            <div className="card-content">
+              <p className="card-description-x">{truncateText(evento.descricao, 100)}</p>
+              <div className="card-info">
+                <div className="card-text-first">
+                  <strong className="card-text-ongname">{evento.ong_id?.nome}</strong>
+                  <span className="date-container">{new Date(evento.data_inicio).toLocaleDateString('pt-BR')}</span>
+                </div>
+              </div>
+              {moderadorId && (
+                <div className="action-buttons">
+                  <button 
+                    onClick={() => handleDeleteEvento(evento)} 
+                    className="delete-btn"
+                    disabled={deletingEventId === evento._id}
+                  >
+                    {deletingEventId === evento._id ? 'Excluindo...' : 'Excluir Evento'}
+                  </button>
+                  <button onClick={() => handleAdvertir(evento)} className="advert-btn">
+                    Aplicar Advertência
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
-          <div className="card-content">
-            <p className="card-description-x">{truncateText(evento.descricao, 100)}</p>
-            <div className="card-text-first">
-              <strong className="card-text-ongname">{evento.ongnome}</strong>
-              <span className="date-container">
-                
-                {evento.data_inicial}
-              </span>
-            </div>
-            <div className="card-text-second">
-              <span className="card-address">
-                
-                {evento.localidade}
-              </span>
-              <span className="card-vagas">
-                
-                {evento.vagas} vagas
-              </span>
-            </div>
-          </div>
-          {moderadorId && (
-            <div className="action-buttons">
-              <button onClick={() => handleDeleteEvento(evento)} className="delete-btn">
-                Excluir Evento
-              </button>
-              <button onClick={() => handleAdvertir(evento)} className="advert-btn">
-                Aplicar Advertência
-              </button>
-            </div>
-          )}
-        </div>
-      ))}
+        ))}
+      </div>
       <Modal
         isOpen={isModalOpen}
         onRequestClose={() => setIsModalOpen(false)}
@@ -237,5 +216,4 @@ const Eventos = () => {
 };
 
 export default Eventos;
-
 

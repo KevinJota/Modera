@@ -9,6 +9,8 @@ const Usuarios = ({ moderadorId }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedUsuario, setSelectedUsuario] = useState(null);
     const [advertencia, setAdvertencia] = useState('');
+    const [nameSearch, setNameSearch] = useState('');
+    const [idSearch, setIdSearch] = useState('');
 
     useEffect(() => {
         const fetchUsuarios = async () => {
@@ -109,36 +111,6 @@ const Usuarios = ({ moderadorId }) => {
         }
     };
 
-    const handleDelete = async (usuario) => {
-        if (window.confirm(`Tem certeza que deseja excluir o usuário ${usuario.nome}?`)) {
-            try {
-                const response = await fetch(`https://volun-api-eight.vercel.app/usuarios/${usuario._id}`, {
-                    method: 'DELETE',
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Erro ao excluir o usuário`);
-                }
-
-                setUsuarios((prevUsuarios) =>
-                    prevUsuarios.filter((u) => u._id !== usuario._id)
-                );
-
-                await registrarAcao(
-                    'excluir',
-                    usuario._id,
-                    'usuario',
-                    `Usuário ${usuario.nome} excluído`
-                );
-
-                alert(`Usuário ${usuario.nome} foi excluído com sucesso.`);
-            } catch (err) {
-                console.error('Erro ao excluir usuário:', err);
-                alert(`Erro ao excluir usuário: ${err.message}`);
-            }
-        }
-    };
-
     const handleAdvertir = (usuario) => {
         setSelectedUsuario(usuario);
         setIsModalOpen(true);
@@ -167,12 +139,34 @@ const Usuarios = ({ moderadorId }) => {
         }
     };
 
+    const filteredUsuarios = usuarios.filter(usuario => {
+        const nameMatch = (usuario.nome + ' ' + usuario.sobrenome).toLowerCase().includes(nameSearch.toLowerCase());
+        const idMatch = usuario._id.includes(idSearch);
+        return nameMatch && idMatch;
+    });
+
     if (loading) return <div className="loading">Carregando...</div>;
     if (error) return <div className="error">Erro: {error}</div>;
 
     return (
         <div className="lista-usuario">
             <h1>Gerenciamento de Usuários</h1>
+            <div className="search-container">
+                <input
+                    type="text"
+                    placeholder="Buscar por nome ou sobrenome"
+                    value={nameSearch}
+                    onChange={(e) => setNameSearch(e.target.value)}
+                    className="search-input"
+                />
+                <input
+                    type="text"
+                    placeholder="Buscar por ID do usuário"
+                    value={idSearch}
+                    onChange={(e) => setIdSearch(e.target.value)}
+                    className="search-input"
+                />
+            </div>
             <table>
                 <thead>
                     <tr>
@@ -184,16 +178,13 @@ const Usuarios = ({ moderadorId }) => {
                     </tr>
                 </thead>
                 <tbody>
-                    {usuarios.map((usuario) => (
+                    {filteredUsuarios.map((usuario) => (
                         <tr key={usuario._id}>
                             <td>{usuario.nome}</td>
                             <td>{usuario.sobrenome}</td>
                             <td>{`(${usuario.ddd}) ${usuario.telefone}`}</td>
                             <td>{usuario.userSuspenso ? 'Suspenso' : 'Ativo'}</td>
                             <td>
-                                <button onClick={() => handleDelete(usuario)} className="btn-delete">
-                                    Excluir
-                                </button>
                                 <button onClick={() => handleAdvertir(usuario)} className="btn-warn">
                                     Advertir
                                 </button>

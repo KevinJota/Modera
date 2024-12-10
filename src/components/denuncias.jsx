@@ -14,7 +14,7 @@ const Denuncias = () => {
           throw new Error('Erro ao buscar as denúncias');
         }
         const data = await response.json();
-        setDenuncias(data);
+        setDenuncias(data.reverse());
       } catch (err) {
         setError(err.message);
       } finally {
@@ -82,4 +82,6 @@ const Denuncias = () => {
 };
 
 export default Denuncias;
+
+
 
